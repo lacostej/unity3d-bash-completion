@@ -12,7 +12,33 @@
 #
 # and bash-completion will source it automatically.
 #
+__unity3d_words_include ()
+{
+    local i=1
+    while [[ $i -lt $COMP_CWORD ]]; do
+        if [[ "${COMP_WORDS[i]}" = "$1" ]]; then
+            return 0
+        fi
+        i=$((++i))
+    done
+    return 1
+}
 
+__unity3dcomp ()
+{
+    # break $1 on space, tab, and newline characters,
+    # and turn it into a newline separated list of words
+    local list s sep=$'\n' IFS=$' '$'\t'$'\n'
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+
+    for s in $1; do
+        __unity3d_words_include "$s" && continue
+        list="$list$s$sep"
+    done
+
+    IFS=$sep
+    COMPREPLY=($(compgen -W "$list" -- "$cur"))
+}
 __unity3d_complete_executeMethod ()
 {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -29,7 +55,7 @@ __unity3d_complete_executeMethod ()
 		method=`echo $cur | cut -d '.' -f 2`
 		if [[ "$cur" != "$class" ]]; then
 			file=$class
-			options=`sed  -n 's/.*static void * \(.*\) *().*/\1/p' Assets/Editor/${class}.cs | grep "^$method" | sed "s/^/$class./g" | sort | xargs echo`
+			options=`grep -v "\binternal\b" Assets/Editor/${class}.cs | sed  -n 's/.*static * void * \(.*\) *( *).*/\1/p' | grep "^$method" | sed "s/^/$class./g" | sort | xargs echo`
 		fi
 
 	fi
@@ -38,6 +64,7 @@ __unity3d_complete_executeMethod ()
 
 _unity3d ()
 {
+	#echo "-> $COMP_CWORD -${#COMP_WORDS[@]}-"
 	local cmd
 
 	cmd="${COMP_WORDS[$COMP_CWORD]}"
@@ -61,7 +88,7 @@ _unity3d ()
 	*)	
 		__unity3dcomp "
 			-batchmode -quit -buildWindowsPlayer -buildOSXPlayer -importPackage -createProject -projectPath
-			-logFile -assetServerUpdate -exportPackage -executeMethod -batchmode
+			-logFile -assetServerUpdate -exportPackage -executeMethod
 			"
 		;;
 	esac
