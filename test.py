@@ -45,7 +45,6 @@ class CompletionTestCase(unittest.TestCase):
         self.assertEqual(c.COMP_CWORD, cword)
         self.assertEqual(c.COMP_POINT, point)
 
-# inspired from http://stackoverflow.com/questions/9137245/unit-test-for-bash-completion-script
 class Unity3dTestCase(unittest.TestCase):
     completion_file="unity3d_bash_completion.sh"
     program="Unity"
