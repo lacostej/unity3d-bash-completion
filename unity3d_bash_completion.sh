@@ -64,7 +64,6 @@ __unity3d_complete_executeMethod ()
 
 _unity3d ()
 {
-	#echo "-> $COMP_CWORD -${#COMP_WORDS[@]}-"
 	local cmd
 
 	cmd="${COMP_WORDS[$COMP_CWORD]}"
