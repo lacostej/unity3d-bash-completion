@@ -42,7 +42,7 @@ __unity3dcomp ()
 __unity3d_complete_executeMethod ()
 {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local editors=$(\ls  Assets/Editor/*.cs | xargs -L1 basename | sed 's/\.cs//g' | xargs echo)
+	local editors=$(\ls ${PROJECT_PATH}/Assets/Editor/*.cs | xargs -L1 basename | sed 's/\.cs//g' | xargs echo)
 	local options=$editors
 	local file
 
@@ -55,7 +55,7 @@ __unity3d_complete_executeMethod ()
 		method=`echo $cur | cut -d '.' -f 2`
 		if [[ "$cur" != "$class" ]]; then
 			file=$class
-			options=`grep -v "\binternal\b" Assets/Editor/${class}.cs | sed  -n 's/.*static * void * \(.*\) *( *).*/\1/p' | grep "^$method" | sed "s/^/$class./g" | sort | xargs echo`
+			options=`grep -v "\binternal\b" ${PROJECT_PATH}/Assets/Editor/${class}.cs | sed  -n 's/.*static * void * \(.*\) *( *).*/\1/p' | grep "^$method" | sed "s/^/$class./g" | sort | xargs echo`
 		fi
 
 	fi
@@ -64,8 +64,21 @@ __unity3d_complete_executeMethod ()
 
 _unity3d ()
 {
-	local cmd
+	# find PROJECT_PATH
+	local i=1
+	PROJECT_PATH=.
+ 	while [[ $i -lt $COMP_CWORD ]]; do
+		local s="${COMP_WORDS[i]}"
+		if [[ "$s" == "-projectPath" && $i < ${#COMP_WORDS[*]} ]]; then
+			i=$((++i))
+			PROJECT_PATH="${COMP_WORDS[i]}"
+			break
+		fi
+		i=$((++i))
+	done
 
+	# find current command
+	local cmd
 	cmd="${COMP_WORDS[$COMP_CWORD]}"
 	if [ -z "$cmd" ]; then
 		cmd="${COMP_WORDS[$COMP_CWORD-1]}"
@@ -77,6 +90,7 @@ _unity3d ()
 		cmd="${COMP_WORDS[$COMP_CWORD-1]}"
  		;;
 	esac
+
 	# subcommands have their own completion functions
 	case "$cmd" in
 	-buildWindowsPlayer|-buildOSXPlayer|-importPackage|-projectPath|-logFile)

@@ -65,6 +65,15 @@ class Unity3dTestCase(unittest.TestCase):
     def test_complete_executeMethod_methods(self):
         self.run_complete("-batchmode -quit -executeMethod MyEditorScript.", "MyEditorScript.PerformFlashBuild MyEditorScript.PerformMacOSXBuild MyEditorScript.PerformWin32Build")
 
+    def test_complete_executeMethod_missing_project_path(self):
+        self.run_complete("-projectPath ", "")
+
+    def test_complete_executeMethod_projectPath(self):
+        self.run_complete("-quit -projectPath proj1 -executeMethod My", "MyEditorScript2")
+
+    def test_complete_executeMethod_projectPath_with_slashes(self):
+        self.run_complete("-projectPath proj1/ -executeMethod My", "MyEditorScript2")
+
     def run_complete(self, command, expected):
         stdout,stderr = Completion().run(self.completion_file, self.program, command)
 
