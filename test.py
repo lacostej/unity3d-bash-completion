@@ -45,9 +45,21 @@ class CompletionTestCase(unittest.TestCase):
         self.assertEqual(c.COMP_CWORD, cword)
         self.assertEqual(c.COMP_POINT, point)
 
-class Unity3dTestCase(unittest.TestCase):
-    completion_file="unity3d_bash_completion.sh"
-    program="Unity"
+class BashCompletionTest(unittest.TestCase):
+    def run_complete(self, completion_file, program, command, expected):
+        stdout,stderr = Completion().run(completion_file, program, command)
+        self.assertEqual(stdout, expected + '\n')
+
+class AdsfTestCase(BashCompletionTest):
+    def test_orig(self):
+        self.run_complete("other arguments f", "four five")
+
+    def run_complete(self, command, expected):
+        completion_file="adsf-completion"
+        program="asdf"
+        super(AdsfTestCase, self).run_complete(completion_file, program, command, expected)
+
+class Unity3dTestCase(BashCompletionTest):
 
     def test_complete_all(self):
         self.run_complete("", "-batchmode -quit -buildWindowsPlayer -buildOSXPlayer -importPackage -createProject -projectPath -logFile -assetServerUpdate -exportPackage -executeMethod")
@@ -74,9 +86,9 @@ class Unity3dTestCase(unittest.TestCase):
         self.run_complete("-projectPath proj1/ -executeMethod My", "MyEditorScript2")
 
     def run_complete(self, command, expected):
-        stdout,stderr = Completion().run(self.completion_file, self.program, command)
-
-        self.assertEqual(stdout, expected + '\n')
+        completion_file="unity3d_bash_completion.sh"
+        program="Unity"
+        super(Unity3dTestCase, self).run_complete(completion_file, program, command, expected)
 
 if (__name__=='__main__'):
     unittest.main()

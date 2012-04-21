@@ -1,0 +1,9 @@
+#!/bin/bash
+_asdf() {
+COMPREPLY=()
+local cur prev
+cur="${COMP_WORDS[$COMP_CWORD]}"
+COMPREPLY=( $( compgen -W "one two three four five six" -- "$cur") )
+return 0
+}    
+complete -F _asdf asdf
